@@ -5,6 +5,7 @@ const User = require('../models/User.model')
 
 /* GET signup page */
 router.get("/signup", (req, res) => {
+  // console.log('res session', req.session)
   res.render("auth/signup");
 });
 
@@ -35,6 +36,7 @@ router.get("/profile", (req, res) => {
 });
 
 router.get('/login', (req, res) => {
+  // console.log('res session', req.session)
   res.render('auth/login')
 })
 
