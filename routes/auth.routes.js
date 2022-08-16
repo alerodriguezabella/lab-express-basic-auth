@@ -34,4 +34,39 @@ router.get("/profile", (req, res) => {
     res.render("auth/profile");
 });
 
+router.get('/login', (req, res) => {
+  res.render('auth/login')
+})
+
+router.post('/login', (req, res) => {
+  // console.log(req.body)
+  const { username, password } = req.body;
+
+ // Check for empty fields
+  if (username === '' || password === '') {
+    res.render('auth/login', {
+      errorMessage: 'Please enter both, username and password to login.'
+    });
+    return;
+  }
+  // 1. if the user is registered ==> meaning the user with provided email/username already exist in our app,
+  User.findOne({ username })
+      .then(user => {
+        if (!user) {
+          // 3. send an error message to the user if any of above is not valid,
+          res.render('auth/login', { errorMessage: 'Username is not registered. Try with other username.' });
+          return;
+          // 2. if the password provided by the user is valid,
+        } else if (bcryptjs.compareSync(password, user.passwordHash)) {
+          // 4. if both are correct, let the user in the app.
+          // req.session.currentUser = user;
+          res.render('auth/profile', user);
+        } else {
+          // 3. send an error message to the user if any of above is not valid,
+          res.render('auth/login', { errorMessage: 'Incorrect password.' });
+        }
+      })
+      .catch(err => console.log(err))
+})
+
 module.exports = router;
