@@ -5,7 +5,7 @@ const User = require('../models/User.model')
 
 /* GET signup page */
 router.get("/signup", (req, res) => {
-  // console.log('res session', req.session)
+  console.log('req session', req.session)
   res.render("auth/signup");
 });
 
@@ -25,6 +25,7 @@ router.post("/signup", (req, res) => {
   })
   .then(userFromDB => {
     // console.log('Newly created user is: ', userFromDB)
+    req.session.currentUser = userFromDB;
     res.redirect('/auth/profile')
   })
   .catch(error => console.log(error))
@@ -32,11 +33,13 @@ router.post("/signup", (req, res) => {
 
   /* GET profile page */
 router.get("/profile", (req, res) => {
-    res.render("auth/profile");
+  console.log('profile page', req.session);
+  const { username } = req.session.currentUser;
+  res.render("auth/profile", { username });
 });
 
 router.get('/login', (req, res) => {
-  // console.log('res session', req.session)
+  console.log('req session', req.session)
   res.render('auth/login')
 })
 
@@ -61,7 +64,7 @@ router.post('/login', (req, res) => {
           // 2. if the password provided by the user is valid,
         } else if (bcryptjs.compareSync(password, user.passwordHash)) {
           // 4. if both are correct, let the user in the app.
-          // req.session.currentUser = user;
+          req.session.currentUser = user;
           res.render('auth/profile', user);
         } else {
           // 3. send an error message to the user if any of above is not valid,
