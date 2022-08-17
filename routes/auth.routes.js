@@ -3,13 +3,15 @@ const bcryptjs = require('bcryptjs')
 const saltRounds = 10
 const User = require('../models/User.model')
 
-/* GET signup page */
-router.get("/signup", (req, res) => {
+const { isLoggedIn, isLoggedOut } = require('../middleware/route-guard')
+
+/* Signup page */
+router.get("/signup", isLoggedOut, (req, res) => {
   console.log('req session', req.session)
   res.render("auth/signup");
 });
 
-router.post("/signup", (req, res) => {
+router.post("/signup", isLoggedOut, (req, res) => {
   // console.log(req.body)
   const {username, password} = req.body
 
@@ -23,27 +25,27 @@ router.post("/signup", (req, res) => {
       passwordHash: hashedPassword
     })
   })
-  .then(userFromDB => {
+  .then(() => {
     // console.log('Newly created user is: ', userFromDB)
-    req.session.currentUser = userFromDB;
-    res.redirect('/auth/profile')
+    res.redirect('/auth/login')
   })
-  .catch(error => console.log(error))
+  .catch(error => res.render("auth/signup", { errorMessage: error }))
 });
 
-  /* GET profile page */
-router.get("/profile", (req, res) => {
+  /* Profile page */
+router.get("/profile", isLoggedIn, (req, res) => {
   console.log('profile page', req.session);
   const { username } = req.session.currentUser;
   res.render("auth/profile", { username });
 });
 
-router.get('/login', (req, res) => {
+  /* Login page */
+router.get('/login', isLoggedOut, (req, res) => {
   console.log('req session', req.session)
   res.render('auth/login')
 })
 
-router.post('/login', (req, res) => {
+router.post('/login', isLoggedOut, (req, res) => {
   // console.log(req.body)
   const { username, password } = req.body;
 
@@ -72,6 +74,14 @@ router.post('/login', (req, res) => {
         }
       })
       .catch(err => console.log(err))
+})
+
+  /* Logout page */
+router.post('/logout', isLoggedIn, (req, res) => {
+  res.clearCookie('connect.sid');
+  req.session.destroy(()=>{
+    res.redirect('/auth/login')
+  })
 })
 
 module.exports = router;

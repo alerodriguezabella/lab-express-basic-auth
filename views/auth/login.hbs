@@ -5,16 +5,16 @@
   <form action="/auth/login" method="POST">
  
     <label> Username
-      <input type="text" name="username" placeholder="Enter your username" require/>
+      <input type="text" name="username" placeholder="Enter your username" required/>
     </label>
  
     <label> Password
-      <input type="password" name="password" placeholder="********" require/>
+      <input type="password" name="password" placeholder="********" required/>
     </label>
  
     <button type="submit">Login</button>
  
-     {{#if errorMessage}}
+    {{#if errorMessage}}
       <p class="error">{{errorMessage}}</p>
     {{/if}}
 

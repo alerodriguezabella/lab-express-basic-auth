@@ -2,7 +2,12 @@ const router = require("express").Router();
 
 /* GET home page */
 router.get("/", (req, res, next) => {
-  res.render("index");
+  if(req.session.currentUser){
+    const { username } = req.session.currentUser;
+    res.render("index", {username});
+  } else {
+    res.render("index");
+  }
 });
 
 module.exports = router;
